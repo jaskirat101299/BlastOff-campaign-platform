@@ -1,0 +1,59 @@
+services:
+  kafka:
+    image: apache/kafka:3.8.0
+    container_name: herald-kafka
+    ports:
+      - "9092:9092"   # for apps running on your machine
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,INTERNAL://:29092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 6
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: herald-kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka
+
+  postgres-campaign:
+    image: postgres:16
+    container_name: herald-pg-campaign
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: campaigns
+      POSTGRES_USER: herald
+      POSTGRES_PASSWORD: herald_dev
+    volumes:
+      - pg-campaign-data:/var/lib/postgresql/data
+
+  postgres-reporting:
+    image: postgres:16
+    container_name: herald-pg-reporting
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: reporting
+      POSTGRES_USER: herald
+      POSTGRES_PASSWORD: herald_dev
+    volumes:
+      - pg-reporting-data:/var/lib/postgresql/data
+
+volumes:
+  pg-campaign-data:
+  pg-reporting-data:
