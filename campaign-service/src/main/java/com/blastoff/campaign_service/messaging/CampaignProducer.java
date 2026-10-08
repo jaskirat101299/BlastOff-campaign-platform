@@ -21,7 +21,7 @@ import java.util.List;
 public class CampaignProducer {
     private final KafkaTemplate<String, CampaignMessage> template;
 
-    @Value("${app.topics.campaign-message}")
+    @Value("${app.topics.campaign-messages}")
     private String topic;
 
     /**

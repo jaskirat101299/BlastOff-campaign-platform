@@ -1,6 +1,7 @@
 package com.blastoff.campaign_service.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class Campaign {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     /**
@@ -34,6 +36,7 @@ public class Campaign {
      * The timestamp indicating when the campaign was created.
      */
     @Column(nullable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
     private Instant createdAt;
 
     /**
