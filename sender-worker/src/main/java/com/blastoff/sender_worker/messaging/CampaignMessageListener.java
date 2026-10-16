@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 public class CampaignMessageListener {
     private final MockEmailSender mockEmailSender;
 
+    private final ResultPublisher resultPublisher;
+
     /**
      * Handles a campaign message received from Kafka.
      *
@@ -26,11 +28,15 @@ public class CampaignMessageListener {
      */
     @KafkaListener(topics = "${app.topics.campaign-messages}")
     public void onMessage(final ConsumerRecord<String, CampaignMessage> record) {
+        final var message = record.value();
+
         log.info("Received partition={} offset={} key={}"
             , record.partition()
             , record.offset()
             , record.key());
 
-        mockEmailSender.send(record.value());
+        mockEmailSender.send(message);
+
+        resultPublisher.publishSent(message);
     }
 }
