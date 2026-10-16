@@ -4,9 +4,9 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      max-poll-records: 10
       group-id: sender-workers
       auto-offset-reset: earliest
+      max-poll-records: 10
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
@@ -14,8 +14,23 @@ spring:
         spring.json.value.default.type: com.blastoff.sender_worker.messaging.CampaignMessage
         spring.json.use.type.headers: false
         spring.json.trusted.packages: com.blastoff.sender_worker.messaging
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      acks: all
+      properties:
+        spring.json.add.type.headers: false
 
 app:
   topics:
     campaign-messages: campaign-messages
-  send-delay-ms: 200
+    campaign-messages-dlt: campaign-messages.DLT
+    message-results: message-results
+  send-delay-ms: 100
+  mock:
+    transient-failure-rate: 0.15
+    permanent-failure-percent: 2
+  retry:
+    max-attempts: 3
+    initial-interval-ms: 500
+    multiplier: 2.0
